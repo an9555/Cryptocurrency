@@ -1,0 +1,88 @@
+npx create-react-app ./
+
+npm install antd @ant-design/icons react-redux @reduxjs/toolkit axios chart.js html-react-parser millify moment react-chartjs-2 
+
+=================
+=========cryptoApi.js==========
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
+
+const cryptoApiHeaders = {
+  'X-Rapidapi-host': 'coinranking1.p.rapidapi.com',
+  'X-Rapidapi-key': 'aee3eae3eemsh088ef7eec58696ap10b202jsne6a3e8902193'
+};
+
+const baseUrl = 'https://coinranking1.p.rapidapi.com';
+
+const createRequest = (url) => ({ url, headers: cryptoApiHeaders });
+
+export const cryptoApi = createApi({
+    reducerPath: 'cryptoApi',
+    baseQuery: fetchBaseQuery({ baseUrl }),
+    endpoints: (builder) => ({
+        getCryptos: builder.query({
+            query: () => createRequest('/coins')
+    })
+  })
+});
+
+export const { useGetCryptosQuery } = cryptoApi;
+=========store .js==========
+import { configureStore } from "@reduxjs/toolkit";
+import { cryptoApi } from "../services/cryptoApi";
+
+export default configureStore({
+  reducer: {
+    [cryptoApi.reducerPath]: cryptoApi.reducer,
+  },
+});
+==========index.js==============
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter as Router } from 'react-router-dom';
+import { Provider } from 'react-redux';
+import App from './App';
+import store from './app/store';
+import 'antd/dist/antd';
+
+ReactDOM.render(
+  <Router>
+    <Provider store={store}>
+      <App/>
+    </Provider>
+  </Router>,
+  document.getElementById('root')
+);
+==========Homepage.jsx=============
+import React from 'react'
+import millify from 'millify';
+import { Typography, Row, Col, Statistic } from 'antd';
+import { Link } from 'react-router-dom';
+import { useGetCryptosQuery } from '../services/cryptoApi';
+const { Title } = Typography;
+
+const Homepage = () => {
+  const { data, isFetching } = useGetCryptosQuery();
+  console.log(data)
+  return (
+    <>
+      <Title level={2} className="heading">Global Crypto Stats</Title>
+      <Row gutter={[32, 32]}>
+        <Col span={12}><Statistic title="Total Cryptocurrencies" value='5'/></Col>
+        <Col span={12}><Statistic title="Total Exchanges" value='12'/></Col>
+        <Col span={12}><Statistic title="Total Market Cap:" value='56'/></Col>
+        <Col span={12}><Statistic title="Total 24h Volume" value='29'/></Col>
+        <Col span={12}><Statistic title="Total Cryptocurrencies" value='17'/></Col>
+        <Col span={12}><Statistic title="Total Markets" value='9'/></Col>
+      </Row>
+    </>
+  )
+}
+
+export default Homepage
+======================
+Warning: Middleware for RTK-Query API at reducerPath "cryptoApi" has not been added to the store.
+You must add the middleware for RTK-Query to function correctly!
+Error: Warning: Middleware for RTK-Query API at reducerPath "cryptoApi" has not been added to the store.
+You must add the middleware for RTK-Query to function correctly!
+====================
+完整修改程式
